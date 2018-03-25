@@ -4,13 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node ./src/server"
+    "start": "ts-node -r dotenv/config ./src/server",
+    "seed": "ts-node -r dotenv/config ./src/seed"
   },
   "author": "kinesivan",
   "license": "ISC",
   "dependencies": {
+    "@koa/cors": "^2.2.1",
     "bcrypt": "^1.0.3",
     "class-validator": "^0.8.4",
+    "dotenv": "^5.0.1",
+    "generate-password": "^1.4.0",
     "koa": "^2.5.0",
     "koa-bodyparser": "^4.2.0",
     "koa-morgan": "^1.0.1",
@@ -29,6 +33,7 @@
     "@types/koa-morgan": "^1.0.4",
     "@types/koa-router": "^7.0.27",
     "@types/koa-session": "^5.7.1",
+    "@types/koa__cors": "^2.2.2",
     "@types/morgan": "^1.7.35",
     "@types/node": "^9.4.7",
     "@types/uuid": "^3.4.3"

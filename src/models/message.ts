@@ -8,8 +8,7 @@ import { Node } from "./node";
 export enum MessageType {
     SYSTEM = 0,
     CHAT = 1,
-    COMMAND = 2,
-    ME = 3
+    ACTION = 2
 }
 
 @Entity()
@@ -36,6 +35,10 @@ export class Message {
     type: number;
 
     @IsNotEmpty()
+    @Column("text", { nullable: true })
+    name: string;
+
+    @IsNotEmpty()
     @Column("text")
     content: string;
 
@@ -48,6 +51,7 @@ export class Message {
             this.author = config.author;
             this.node = config.node;
             this.type = config.type;
+            this.name = config.name;
             this.content = config.content;
         }
     }
@@ -55,7 +59,7 @@ export class Message {
     @BeforeInsert()
     @BeforeUpdate()
     private async validate() {
-        const errors = await validate(this);
+        const errors = await validate(this, { validationError: { target: false } });
         if(errors.length) throw errors[0];
     }
 }
@@ -64,5 +68,6 @@ export interface MessageConfig {
     author: Visitor;
     node: Node;
     type: MessageType,
+    name: string;
     content: string;
 }

@@ -34,7 +34,7 @@ export class Script {
     @BeforeInsert()
     @BeforeUpdate()
     private async validate() {
-        const errors = await validate(this);
+        const errors = await validate(this, { validationError: { target: false } });
         if(errors.length) throw errors[0];
     }
 }

@@ -8,6 +8,8 @@ import { Command } from "../models/command";
 import { isLoggedIn } from "../middlewares/auth";
 import { isNodeOwner } from "../middlewares/permissions";
 
+import { parseCommand, runNodeCommand } from "../utils/command.utils";
+
 const router = new Router();
 
 router.param("node_id", async (id, ctx, next) => {
@@ -20,6 +22,7 @@ router.param("node_id", async (id, ctx, next) => {
 router.get("/", async (ctx) => {
     const query_params = ctx.query.name && { name: ctx.query.name };
     const nodes = await ctx.db.find(Node, { skip: ctx.query.skip || 0, take: ctx.query.limit || null, where: { ...query_params } });
+    if(!nodes.length) return ctx.throw(404);
     ctx.body = { nodes };
 });
 
@@ -30,7 +33,7 @@ router.get("/:node_id", async (ctx) => {
 
 // [GET] Node log
 router.get("/:node_id/log", async (ctx) => {
-    const messages = await ctx.db.find(Message, { skip: ctx.query.skip || 0, take: ctx.query.limit || null });
+    const messages = await ctx.db.find(Message, { where: { node_id: ctx.node.node_id }, skip: ctx.query.skip || 0, take: ctx.query.limit || null });
     ctx.body = { messages };
 });
 
@@ -52,9 +55,22 @@ router.post("/:node_id/log", isLoggedIn, async (ctx) => {
         author: ctx.session!.visitor,
         node: ctx.node,
         type: parseInt(ctx.request.body.type),
+        name: ctx.session!.visitor.name,
         content: ctx.request.body.content
     });
-    ctx.body = await ctx.db.save(message);
+    await ctx.db.save(message);
+    ctx.body = await ctx.db.findOneById(Message, message.message_id);
+});
+
+// [POST] New command action to node
+router.post("/:node_id/log/command", isLoggedIn, async (ctx) => {
+    if(!ctx.request.body.name)
+        return ctx.throw(400);
+    const raw = `/${ctx.request.body.name} ${ctx.request.body.content}`;
+    const command = parseCommand(raw);
+    const result = await runNodeCommand({ command, node: ctx.node, visitor: ctx.session!.visitor });
+    ctx.assert(result, 404);
+    ctx.status = 202;
 });
 
 // [POST] New node command

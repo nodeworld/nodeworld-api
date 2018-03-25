@@ -3,11 +3,13 @@ import * as bodyparser from "koa-bodyparser";
 import * as session from "koa-session";
 
 import * as koa from "koa";
+import * as cors from "@koa/cors";
 
 import { router as api_routes } from "./controllers";
 
 const app = new koa();
 
+// App declaration
 app.keys = process.env.SECRET ? [process.env.SECRET] : ["secret"];
 
 // Error-handling middleware
@@ -25,6 +27,7 @@ app.use(async (ctx, next) => {
 })
 
 // Third-party middleware
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(morgan("dev"));
 app.use(bodyparser());
 app.use(session(app));

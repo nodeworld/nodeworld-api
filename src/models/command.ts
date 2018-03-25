@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, OneToOne, BeforeInsert, BeforeUpdate } from "typeorm";
-import { validate } from "class-validator";
+import { validate, IsNotEmpty } from "class-validator";
 import { v1 as uuidv1 } from "uuid";
 
 import { Node } from "./node";
@@ -24,6 +24,7 @@ export class Command {
     @JoinColumn({ name: "script_id" })
     script: Script | null;
 
+    @IsNotEmpty()
     @Column("text")
     name: string;
 
@@ -39,7 +40,7 @@ export class Command {
     @BeforeInsert()
     @BeforeUpdate()
     private async validate() {
-        const errors = await validate(this);
+        const errors = await validate(this, { validationError: { target: false } });
         if(errors.length) throw errors[0];
     }
 }
