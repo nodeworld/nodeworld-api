@@ -63,4 +63,8 @@ typings/
 # Ormconfig
 ormconfig.json
 
+# Docker
+Dockerfile
+.dockerignore
+
 Icon?
