@@ -1,3 +1,8 @@
-import { Context} from "koa";
+import { Request, Response, NextFunction } from "express";
 
-export const isNodeOwner = async (ctx: Context, next: () => Promise<any>) => { ctx.assert(ctx.session!.visitor.visitor_id === ctx.node.owner_id, 401); await next(); }
+export const isNodeOwner = async (req: Request, res: Response, next: NextFunction) => {
+    if(req.session!.visitor!.id === req.ctx_node!.owner_id)
+        next();
+    else
+        next({ message: "Insufficient permissions.", status: 401 });
+}

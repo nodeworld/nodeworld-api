@@ -9,7 +9,7 @@ import { Message } from "./message";
 @Entity()
 export class Node {
     @PrimaryColumn("uuid")
-    node_id: string;
+    id: string;
 
     @Column({ nullable: true })
     owner_id: string;
@@ -35,7 +35,7 @@ export class Node {
 
     constructor(config: NodeConfig) {
         if(config) {
-            this.node_id = uuidv1();
+            this.id = uuidv1();
             this.owner = config.owner;
             this.name = config.name;
             this.greeting = config.greeting || null;
@@ -51,9 +51,9 @@ export class Node {
 
     public safe() {
         if(this.owner)
-            return { node_id: this.node_id, name: this.name, greeting: this.greeting, owner_id: this.owner.visitor_id }
+            return { node_id: this.id, name: this.name, greeting: this.greeting, owner_id: this.owner.id }
         else
-            return { node_id: this.node_id, name: this.name, greeting: this.greeting, owner_id: this.owner_id }
+            return { node_id: this.id, name: this.name, greeting: this.greeting, owner_id: this.owner_id }
     }
 }
 

@@ -8,7 +8,7 @@ import { Script } from "./script";
 @Entity()
 export class Command {
     @PrimaryColumn("uuid")
-    command_id: string;
+    id: string;
 
     @Column({ nullable: true })
     node_id: string;
@@ -30,7 +30,7 @@ export class Command {
 
     constructor(config: CommandConfig) {
         if(config) {
-            this.command_id = uuidv1();
+            this.id = uuidv1();
             this.node = config.node;
             this.script = config.script || null;
             this.name = config.name;

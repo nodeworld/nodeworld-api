@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, BeforeUpdate, BeforeInsert, AfterLoad, OneToMany } from "typeorm";
+import { Entity, Column, PrimaryColumn, BeforeUpdate, BeforeInsert, OneToMany } from "typeorm";
 import { genSalt, hash as genHash, compare } from "bcrypt";
 import { validate, IsAlphanumeric, IsNotEmpty, IsOptional, IsEmail } from "class-validator";
 import { v1 as uuidv1 } from "uuid";
@@ -10,7 +10,7 @@ import { Message } from "./message";
 @Entity()
 export class Visitor {
     @PrimaryColumn("uuid")
-    visitor_id: string;
+    id: string;
 
     @OneToMany(type => Node, node => node.owner)
     nodes: Node[];
@@ -39,7 +39,7 @@ export class Visitor {
 
     constructor(config: VisitorConfig) {
         if(config) {
-            this.visitor_id = uuidv1();
+            this.id = uuidv1();
             this.name = config.name;
             this.email = config.email || null;
         }
@@ -63,8 +63,14 @@ export class Visitor {
     }
 
     public safe() {
-        return { visitor_id: this.visitor_id, name: this.name, email: this.email };
+        return { id: this.id, name: this.name, email: this.email };
     }
+}
+
+export interface PublicVisitor {
+    id: string;
+    name: string;
+    email: string | null;
 }
 
 export interface VisitorConfig {

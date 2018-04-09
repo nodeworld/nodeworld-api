@@ -1,6 +1,6 @@
 import { getConnection } from "typeorm";
 
-import { Visitor } from "../models/visitor";
+import { PublicVisitor } from "../models/visitor";
 import { Node } from "../models/node";
 import { Command } from "../models/command";
 
@@ -12,7 +12,7 @@ export interface CommandData {
 
 export interface NodeCommandContext {
     command: CommandData;
-    visitor: Visitor;
+    visitor: PublicVisitor;
     node: Node;
 }
 
@@ -27,7 +27,7 @@ export const parseCommand = (raw: string): CommandData => {
 
 export const runNodeCommand = async (ctx: NodeCommandContext): Promise<boolean> => {
     const db = getConnection().getRepository(Command);
-    const command = await db.findOne({ node_id: ctx.node.node_id, name: ctx.command.name });
+    const command = await db.findOne({ node_id: ctx.node.id, name: ctx.command.name });
     if(command) return true; else return false;
     //
     //  run command stuff

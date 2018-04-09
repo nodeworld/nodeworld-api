@@ -1,38 +1,28 @@
-import * as morgan from "koa-morgan";
-import * as bodyparser from "koa-bodyparser";
-import * as session from "koa-session";
+import * as morgan from "morgan";
+import * as bodyparser from "body-parser";
+import * as cookieparser from "cookie-parser";
 
-import * as koa from "koa";
-import * as cors from "@koa/cors";
+import * as express from "express";
+import * as cors from "cors";
 
 import { router as api_routes } from "./controllers";
 
-const app = new koa();
-
-// App declaration
-app.keys = process.env.SECRET ? [process.env.SECRET] : ["secret"];
-
-// Error-handling middleware
-app.use(async (ctx, next) => {
-    try {
-        await next();
-    } catch (err) {
-        ctx.status = err.statusCode || err.status || 500;
-        console.log(err);
-        ctx.body = {
-            errors: err.message ? err.message : err
-        };
-        app.emit('err', err, ctx);
-    }
-})
+const app = express();
 
 // Third-party middleware
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(morgan("dev"));
-app.use(bodyparser());
-app.use(session(app));
+app.use(cookieparser());
+app.use(bodyparser.urlencoded({ extended: false }));
+app.use(bodyparser.json());
 
 // API Middleware
-app.use(api_routes.routes());
+app.use(api_routes);
+
+// Error-handling middleware
+app.use((err: { status: number, message: string }, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.log(err);
+    res.status(err.status || 500).json({ errors: { message: err.message, status: err.status || 500 }});
+});
 
 export { app };

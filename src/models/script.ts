@@ -7,7 +7,7 @@ import { Visitor } from "./visitor";
 @Entity()
 export class Script {
     @PrimaryColumn("uuid")
-    script_id: string;
+    id: string;
 
     @Column({ nullable: true })
     owner_id: string;
@@ -25,7 +25,7 @@ export class Script {
 
     constructor(config: ScriptConfig) {
         if(config) {
-            this.script_id = uuidv1();
+            this.id = uuidv1();
             this.name = config.name;
             this.code = config.code || null;
         }

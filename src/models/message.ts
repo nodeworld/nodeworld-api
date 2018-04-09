@@ -14,7 +14,7 @@ export enum MessageType {
 @Entity()
 export class Message {
     @PrimaryColumn("uuid")
-    message_id: string;
+    id: string;
 
     @Column({ nullable: true })
     author_id: string;
@@ -47,7 +47,7 @@ export class Message {
 
     constructor(config: MessageConfig) {
         if(config) {
-            this.message_id = uuidv1();
+            this.id = uuidv1();
             this.author = config.author;
             this.node = config.node;
             this.type = config.type;
@@ -61,6 +61,17 @@ export class Message {
     private async validate() {
         const errors = await validate(this, { validationError: { target: false } });
         if(errors.length) throw errors[0];
+    }
+
+    public safe() {
+        return {
+            id: this.id,
+            author_id: this.author ? this.author.id : this.author_id,
+            node_id: this.node ? this.node.id : this.node_id,
+            type: this.type,
+            name: this.name,
+            content: this.content
+        };
     }
 }
 
