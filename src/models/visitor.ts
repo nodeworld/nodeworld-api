@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryColumn, BeforeUpdate, BeforeInsert, OneToMany } from "typeorm";
-import { genSalt, hash as genHash, compare } from "bcrypt";
+import { genSalt, hash as genHash, compare, compareSync } from "bcrypt";
 import { validate, IsAlphanumeric, IsNotEmpty, IsOptional, IsEmail } from "class-validator";
 import { v1 as uuidv1 } from "uuid";
 
@@ -59,7 +59,7 @@ export class Visitor {
     }
 
     public async authenticate(password: string) {
-        return compare(password, this.password_hash);
+        return await compare(password, this.password_hash);
     }
 
     public safe() {

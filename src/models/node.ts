@@ -51,9 +51,9 @@ export class Node {
 
     public safe() {
         if(this.owner)
-            return { node_id: this.id, name: this.name, greeting: this.greeting, owner_id: this.owner.id }
+            return { id: this.id, name: this.name, greeting: this.greeting, owner_id: this.owner.id }
         else
-            return { node_id: this.id, name: this.name, greeting: this.greeting, owner_id: this.owner_id }
+            return { id: this.id, name: this.name, greeting: this.greeting, owner_id: this.owner_id }
     }
 }
 

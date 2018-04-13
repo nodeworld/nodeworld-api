@@ -10,7 +10,7 @@ import { router as api_routes } from "./controllers";
 const app = express();
 
 // Third-party middleware
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: process.env.WEB_ENDPOINT, credentials: true }));
 app.use(morgan("dev"));
 app.use(cookieparser());
 app.use(bodyparser.urlencoded({ extended: false }));

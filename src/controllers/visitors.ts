@@ -9,7 +9,7 @@ import { signToken } from "../utils/jwt.utils";
 
 const router = express.Router();
 
-router.param('visitor_id', async (req, res, next, id) => {
+export const paramVisitorID = router.param('visitor_id', async (req, res, next, id) => {
     try {
         const db = getConnection().getRepository(Visitor);
         req.ctx_visitor = await db.findOneById(id);
@@ -19,7 +19,7 @@ router.param('visitor_id', async (req, res, next, id) => {
 });
 
 //  [GET] All Visitors
-router.get("/", async (req, res, next) => {
+export const getVisitors = router.get("/", async (req, res, next) => {
     try {
         const db = getConnection().getRepository(Visitor);
         const visitors = await db.find();
@@ -28,23 +28,23 @@ router.get("/", async (req, res, next) => {
 });
 
 //  [GET] Logged in visitor
-router.get("/me", isLoggedIn, async (req, res, next) => {
+export const getMe = router.get("/me", isLoggedIn, async (req, res, next) => {
     res.json(req.visitor);
 });
 
 //  [GET] Logout
-router.get("/logout", isLoggedIn, async (req, res, next) => {
+export const getLogout = router.get("/logout", isLoggedIn, async (req, res, next) => {
     res.clearCookie("visitor_session");
     res.status(204).send();
 });
 
 //  [GET] Visitor by ID
-router.get("/:visitor_id", async (req, res, next) => {
+export const getVisitorID = router.get("/:visitor_id", async (req, res, next) => {
     res.json(req.ctx_visitor);
 });
 
 //  [POST] New Visitor
-router.post("/", async (req, res, next) => {
+export const postVisitor = router.post("/", async (req, res, next) => {
     try {
         const db = getConnection().manager;
         const visitor = new Visitor({
@@ -63,7 +63,7 @@ router.post("/", async (req, res, next) => {
 });
 
 //  [POST] Login
-router.post("/login", async (req, res, next) => {
+export const postLogin = router.post("/login", async (req, res, next) => {
     try {
         if(req.visitor) throw { message: "Already logged in.", status: 403 };
         const db = getConnection().getRepository(Visitor);
@@ -73,13 +73,15 @@ router.post("/login", async (req, res, next) => {
         });
         if(!visitor) throw { message: "Not found.", status: 404 }
         if(!(await visitor.authenticate(req.body.password))) throw { message: "Authentication failed.", status: 403 };
-        res.cookie("visitor_session", signToken(visitor.safe()));
+        const token = await signToken(visitor.safe());
+        console.log(token);
+        res.cookie("visitor_session", token);
         res.json(visitor.safe());
     } catch(e) { next(e); }
 });
 
 //  [PATCH] Logged in visitor
-router.patch("/me", isLoggedIn, async (req, res, next) => {
+export const patchMe = router.patch("/me", isLoggedIn, async (req, res, next) => {
     try {
         if(req.body.visitor_id) throw { message: "Cannot change visitor ID", status: 403 };
         const db = getConnection().getRepository(Visitor);

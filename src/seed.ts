@@ -1,12 +1,15 @@
-import { createConnection } from "typeorm";
+import { createConnection, getConnection } from "typeorm";
 import { generate } from "generate-password";
 
 import { Node } from "./models/node";
 import { Visitor } from "./models/visitor";
 
+import { blockingConnectionWait } from "./server";
+
 (async () => {
     try {
-        const db = (await createConnection()).manager;
+        await blockingConnectionWait();
+        const db = getConnection().manager;
         if(await db.findOne(Node, { name: "main" }))
             await db.remove(await db.findOne(Node, { name: "main" }));
         if(await db.findOne(Visitor, { name: process.env.MAIN_MANAGER_NAME || "nodeworld" }))
