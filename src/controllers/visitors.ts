@@ -1,6 +1,6 @@
 import * as express from "express";
 
-import { getConnection } from "typeorm";
+import { getConnection, getRepository } from "typeorm";
 
 import { Visitor } from "../models/visitor";
 import { Node } from "../models/node";
@@ -9,42 +9,47 @@ import { signToken } from "../utils/jwt.utils";
 
 const router = express.Router();
 
-export const paramVisitorID = router.param('visitor_id', async (req, res, next, id) => {
+export const paramVisitorID: express.RequestParamHandler = async (req, res, next, id) => {
     try {
         const db = getConnection().getRepository(Visitor);
         req.ctx_visitor = await db.findOneById(id);
         if(!req.ctx_visitor) throw { message: "Not found.", status: 404 };
         await next();
     } catch(e) { next(e); }
-});
+};
+router.param('visitor_id', paramVisitorID);
 
 //  [GET] All Visitors
-export const getVisitors = router.get("/", async (req, res, next) => {
+export const getVisitors: express.RequestHandler = async (req, res, next) => {
     try {
-        const db = getConnection().getRepository(Visitor);
+        const db = getRepository(Visitor);
         const visitors = await db.find();
         res.json({ visitors });
     } catch(e) { next(e); }
-});
+};
+router.get("/", getVisitors);
 
 //  [GET] Logged in visitor
-export const getMe = router.get("/me", isLoggedIn, async (req, res, next) => {
+export const getMe: express.RequestHandler = async (req, res, next) => {
     res.json(req.visitor);
-});
+};
+router.get("/me", isLoggedIn, getMe);
 
 //  [GET] Logout
-export const getLogout = router.get("/logout", isLoggedIn, async (req, res, next) => {
+export const getLogout: express.RequestHandler = async (req, res, next) => {
     res.clearCookie("visitor_session");
     res.status(204).send();
-});
+};
+router.get("/logout", isLoggedIn, getLogout);
 
 //  [GET] Visitor by ID
-export const getVisitorID = router.get("/:visitor_id", async (req, res, next) => {
+export const getVisitorID: express.RequestHandler = async (req, res, next) => {
     res.json(req.ctx_visitor);
-});
+};
+router.get("/:visitor_id", getVisitorID);
 
 //  [POST] New Visitor
-export const postVisitor = router.post("/", async (req, res, next) => {
+export const postVisitor: express.RequestHandler = async (req, res, next) => {
     try {
         const db = getConnection().manager;
         const visitor = new Visitor({
@@ -60,10 +65,11 @@ export const postVisitor = router.post("/", async (req, res, next) => {
         await db.save([visitor, visitor_node]);
         res.json({ visitor: visitor.safe(), node: visitor_node.safe() });
     } catch(e) { next(e); }
-});
+};
+router.post("/", postVisitor);
 
 //  [POST] Login
-export const postLogin = router.post("/login", async (req, res, next) => {
+export const postLogin: express.RequestHandler = async (req, res, next) => {
     try {
         if(req.visitor) throw { message: "Already logged in.", status: 403 };
         const db = getConnection().getRepository(Visitor);
@@ -78,10 +84,11 @@ export const postLogin = router.post("/login", async (req, res, next) => {
         res.cookie("visitor_session", token);
         res.json(visitor.safe());
     } catch(e) { next(e); }
-});
+};
+router.post("/login", postLogin);
 
 //  [PATCH] Logged in visitor
-export const patchMe = router.patch("/me", isLoggedIn, async (req, res, next) => {
+export const patchMe: express.RequestHandler = async (req, res, next) => {
     try {
         if(req.body.visitor_id) throw { message: "Cannot change visitor ID", status: 403 };
         const db = getConnection().getRepository(Visitor);
@@ -94,6 +101,7 @@ export const patchMe = router.patch("/me", isLoggedIn, async (req, res, next) =>
         req.visitor = visitor.safe();
         res.json(visitor.safe());
     } catch(e) { next(e); }
-});
+};
+router.patch("/me", isLoggedIn, patchMe);
 
 export { router };
