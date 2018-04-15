@@ -1,6 +1,6 @@
 import * as express from "express";
 
-import { getConnection, getRepository } from "typeorm";
+import { getRepository, getManager } from "typeorm";
 
 import { Visitor } from "../models/visitor";
 import { Node } from "../models/node";
@@ -11,7 +11,7 @@ const router = express.Router();
 
 export const paramVisitorID: express.RequestParamHandler = async (req, res, next, id) => {
     try {
-        const db = getConnection().getRepository(Visitor);
+        const db = getRepository(Visitor);
         req.ctx_visitor = await db.findOneById(id);
         if(!req.ctx_visitor) throw { message: "Not found.", status: 404 };
         await next();
@@ -51,7 +51,7 @@ router.get("/:visitor_id", getVisitorID);
 //  [POST] New Visitor
 export const postVisitor: express.RequestHandler = async (req, res, next) => {
     try {
-        const db = getConnection().manager;
+        const db = getManager();
         const visitor = new Visitor({
             name: req.body.name,
             email: req.body.email,
@@ -72,7 +72,7 @@ router.post("/", postVisitor);
 export const postLogin: express.RequestHandler = async (req, res, next) => {
     try {
         if(req.visitor) throw { message: "Already logged in.", status: 403 };
-        const db = getConnection().getRepository(Visitor);
+        const db = getRepository(Visitor);
         const visitor = await db.findOne({
             select: ["id", "name", "email", "password_salt", "password_hash"],
             where: { name: req.body.name }
@@ -91,7 +91,7 @@ router.post("/login", postLogin);
 export const patchMe: express.RequestHandler = async (req, res, next) => {
     try {
         if(req.body.visitor_id) throw { message: "Cannot change visitor ID", status: 403 };
-        const db = getConnection().getRepository(Visitor);
+        const db = getRepository(Visitor);
         const visitor = await db.findOneById(req.visitor.id, {
             select: ["id", "name", "email", "password_salt", "password_hash"]
         });

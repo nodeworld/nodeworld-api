@@ -1,6 +1,6 @@
 import * as express from "express";
 
-import { getConnection } from "typeorm";
+import { getRepository, getManager } from "typeorm";
 
 import { Node } from "../models/node";
 import { Message } from "../models/message";
@@ -15,7 +15,7 @@ const router = express.Router();
 
 export const paramNodeID: express.RequestParamHandler = async (req, res, next, id) => {
     try {
-        const db = getConnection().getRepository(Node);
+        const db = getRepository(Node);
         req.ctx_node = await db.findOneById(id);
         if(!req.ctx_node) throw { message: "Not found.", status: 404 };
         await next();
@@ -26,7 +26,7 @@ router.param("node_id", paramNodeID);
 //  [GET] All nodes
 export const getNodes: express.RequestHandler = async (req, res, next) => {
     try {
-        const db = getConnection().getRepository(Node);
+        const db = getRepository(Node);
         const query_params = req.query.name && { name: req.query.name };
         const nodes = await db.find({ skip: req.query.skip || 0, take: req.query.limit || null, where: { ...query_params } });
         if(!nodes.length) throw { message: "Not found.", status: 404 };
@@ -44,7 +44,7 @@ router.get("/node:id", getNodeID);
 // [GET] Node log
 export const getNodeIDLog: express.RequestHandler = async (req, res, next) => {
     try {
-        const db = getConnection().getRepository(Message);
+        const db = getRepository(Message);
         const messages = await db.find({ where: { node_id: req.ctx_node!.id }, skip: req.query.skip || 0, take: req.query.limit || null });
         res.json({ messages });
     } catch(e) { next(e); }
@@ -54,7 +54,7 @@ router.get("/:node_id/log", getNodeIDLog);
 // [GET] Node commands
 export const getNodeIDCommands: express.RequestHandler = async (req, res, next) => {
     try {
-        const db = getConnection().getRepository(Command);
+        const db = getRepository(Command);
         const commands = await db.find({ node_id: req.ctx_node!.id });
         res.json({ commands });
     } catch(e) { next(e); }
@@ -64,7 +64,7 @@ router.get("/:node_id/commands");
 // [GET] Node owner
 export const getNodeIDOwner: express.RequestHandler = async (req, res, next) => {
     try {
-        const db = getConnection().getRepository(Visitor);
+        const db = getRepository(Visitor);
         const owner = await db.findOneById(req.ctx_node!.owner_id);
         res.json(owner);
     } catch(e) { next(e); }
@@ -74,7 +74,7 @@ router.get("/:node_id/owner", getNodeIDOwner);
 // [POST] New message to node log
 export const postNodeIDLog: express.RequestHandler = async (req, res, next) => {
     try {
-        const db = getConnection().manager;
+        const db = getManager();
         const visitor = await db.findOneById(Visitor, req.visitor.id);    // TODO: find a way to omit this
         const message = new Message({
             author: visitor!,
@@ -107,7 +107,7 @@ router.post("/:node_id/log/command", isLoggedIn, postNodeIDLogCommand);
 // [POST] New node command
 export const postNodeIDCommand: express.RequestHandler = async (req, res, next) => {
     try {
-        const db = getConnection().getRepository(Command);
+        const db = getRepository(Command);
         const command = new Command({
             node: req.ctx_node!,
             name: req.body.name,
