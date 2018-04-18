@@ -8,6 +8,14 @@
     "seed": "ts-node -r dotenv/config ./src/seed",
     "test": "mocha -r ts-node/register -r dotenv/config ./test/**/*.ts"
   },
+  "nyc": {
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "**/*.d.ts"
+    ]
+  },
   "author": "kinesivan",
   "license": "ISC",
   "dependencies": {
@@ -60,6 +68,7 @@
     "@types/node": "^9.4.7",
     "@types/sinon": "^4.3.1",
     "@types/uuid": "^3.4.3",
-    "keypair": "^1.0.1"
+    "keypair": "^1.0.1",
+    "nyc": "^11.6.0"
   }
 }

@@ -23,9 +23,10 @@ router.param('visitor_id', paramVisitorID);
 export const getVisitors: express.RequestHandler = async (req, res, next) => {
     try {
         const db = getRepository(Visitor);
-        const visitors = await db.find();
+        const query_params = req.query.name && { name: req.query.name };
+        const visitors = await db.find({ skip: req.query.skip || 0, take: req.query.limit || 0, where: query_params });
         res.json({ visitors });
-    } catch(e) { next(e); }
+    } catch(e) { console.log(e); next(e); }
 };
 router.get("/", getVisitors);
 
