@@ -11,10 +11,10 @@ export class Node {
     @PrimaryColumn("uuid")
     id: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: false })
     owner_id: string;
 
-    @ManyToOne(type => Visitor, visitor => visitor.nodes, { onDelete: "CASCADE" })
+    @ManyToOne(type => Visitor, visitor => visitor.nodes, { onDelete: "CASCADE", nullable: false })
     @JoinColumn({ name: "owner_id" })
     owner: Visitor;
 

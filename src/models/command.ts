@@ -10,17 +10,17 @@ export class Command {
     @PrimaryColumn("uuid")
     id: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: false })
     node_id: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: false })
     script_id: string | null;
 
     @ManyToOne(type => Node, node => node.commands, { onDelete: "CASCADE" })
     @JoinColumn({ name: "node_id" })
     node: Node;
 
-    @OneToOne(type => Script, { nullable: true })
+    @OneToOne(type => Script)
     @JoinColumn({ name: "script_id" })
     script: Script | null;
 

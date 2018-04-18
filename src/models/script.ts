@@ -9,7 +9,7 @@ export class Script {
     @PrimaryColumn("uuid")
     id: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: false })
     owner_id: string;
 
     @ManyToOne(type => Visitor, visitor => visitor.scripts, { onDelete: "CASCADE" })
