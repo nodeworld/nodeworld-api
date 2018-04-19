@@ -54,6 +54,7 @@ export class Visitor {
     }
 
     public async setPassword(password: string) {
+        if(!password.trim()) throw new Error("Password required.");
         this.password_salt = await genSalt(10);
         this.password_hash = await genHash(password, this.password_salt);
     }

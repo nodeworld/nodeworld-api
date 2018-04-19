@@ -16,17 +16,17 @@ export class Message {
     @PrimaryColumn("uuid")
     id: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: false })
     author_id: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: false })
     node_id: string;
 
-    @ManyToOne(type => Visitor, visitor => visitor.messages)
+    @ManyToOne(type => Visitor, visitor => visitor.messages, { nullable: false })
     @JoinColumn({ name: "author_id" })
     author: Visitor;
 
-    @ManyToOne(type => Node, node => node.messages)
+    @ManyToOne(type => Node, node => node.messages, { nullable: false })
     @JoinColumn({ name: "node_id" })
     node: Node;
 
