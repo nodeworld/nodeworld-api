@@ -14,7 +14,7 @@ const app = express();
 app.use(helmet());
 app.use(cors({ origin: process.env.WEB_ENDPOINT, credentials: true }));
 app.use(morgan("dev"));
-app.use(cookieparser());
+app.use(cookieparser(process.env.TOKEN_SECRET));
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 
