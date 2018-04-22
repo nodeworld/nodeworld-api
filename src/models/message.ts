@@ -1,6 +1,8 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, CreateDateColumn, BeforeInsert, BeforeUpdate } from "typeorm";
-import { validate, IsIn, IsNotEmpty } from "class-validator";
+import { validate, IsIn, IsNotEmpty, MaxLength } from "class-validator";
 import { v1 as uuidv1 } from "uuid";
+
+import { MAX_CHARACTER_LIMIT } from "../constants/message.constants";
 
 import { Visitor } from "./visitor";
 import { Node } from "./node";
@@ -39,6 +41,7 @@ export class Message {
     name: string;
 
     @IsNotEmpty()
+    @MaxLength(MAX_CHARACTER_LIMIT)
     @Column("text")
     content: string;
 
