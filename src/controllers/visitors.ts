@@ -82,7 +82,7 @@ export const postLogin: express.RequestHandler = async (req, res, next) => {
         if(!(await visitor.authenticate(req.body.password))) throw { message: "Authentication failed.", status: 403 };
         const token = await signToken(visitor.safe());
         console.log(token);
-        res.cookie("visitor_session", token, { httpOnly: true, secure: true, signed: true });
+        res.cookie("visitor_session", token, { httpOnly: true, signed: true, domain: "nodeworld.io" });
         res.json(visitor.safe());
     } catch(e) { next(e); }
 };

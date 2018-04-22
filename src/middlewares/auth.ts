@@ -10,7 +10,7 @@ export const isLoggedIn = async (req: Request, res: Response, next: NextFunction
         req.visitor = await readToken(token) as PublicVisitor;
         next();
     } catch(e) {
-        if(req.cookies["visitor_session"]) res.clearCookie("visitor_session");
+        if(req.signedCookies["visitor_session"]) res.clearCookie("visitor_session");
         next(e);
     }
 }
