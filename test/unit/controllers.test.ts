@@ -44,15 +44,15 @@ describe("Controllers", () => {
             });
 
             it("should return an array of visitors", async () => {
-                await controllerSpy(req as Request, res as Response, spy);
-                assert(!controllerSpy.threw(), "controller should not throw");
+                await controllerSpy(req as Request, res as Response, next);
+                s_assert.notCalled(next as SinonSpy);
                 s_assert.calledWithExactly(res.json as SinonSpy, { visitors: dbData.visitors });
             });
 
             it("should respect skipping", async () => {
                 req.query = { skip: 1 };
-                await controllerSpy(req as Request, res as Response, spy);
-                assert(!controllerSpy.threw(), "controller should not throw");
+                await controllerSpy(req as Request, res as Response, next);
+                s_assert.notCalled(next as SinonSpy);
                 s_assert.calledWithExactly(
                     res.json as SinonSpy,
                     { visitors: dbData.visitors.slice(1) },
@@ -61,8 +61,8 @@ describe("Controllers", () => {
 
             it("should respect limiting", async () => {
                 req.query = { limit: 1 };
-                await controllerSpy(req as Request, res as Response, spy);
-                assert(!controllerSpy.threw(), "controller should not throw");
+                await controllerSpy(req as Request, res as Response, next);
+                s_assert.notCalled(next as SinonSpy);
                 s_assert.calledWithExactly(
                     res.json as SinonSpy,
                     { visitors: dbData.visitors.slice(0, 1) },
@@ -71,8 +71,8 @@ describe("Controllers", () => {
 
             it("should respect skipping and limiting", async () => {
                 req.query = { skip: 1, limit: 1 };
-                await controllerSpy(req as Request, res as Response, spy);
-                assert(!controllerSpy.threw(), "controller should not throw");
+                await controllerSpy(req as Request, res as Response, next);
+                s_assert.notCalled(next as SinonSpy);
                 s_assert.calledWithExactly(
                     res.json as SinonSpy,
                     { visitors: dbData.visitors.slice(1, 2) },
@@ -84,8 +84,8 @@ describe("Controllers", () => {
             it("should return the current visitor", async () => {
                 const controllerSpy = spy(VisitorController.getMe);
                 req.visitor = dbData.visitors[0];
-                await controllerSpy(req as Request, res as Response, spy);
-                assert(!controllerSpy.threw(), "controller should not throw");
+                await controllerSpy(req as Request, res as Response, next);
+                s_assert.notCalled(next as SinonSpy);
                 s_assert.calledWithExactly(res.json as SinonSpy, req.visitor);
             });
         });
@@ -94,30 +94,41 @@ describe("Controllers", () => {
             it("should delete the auth token", async () => {
                 const controllerSpy = spy(VisitorController.getLogout);
                 req.cookies = { visitor_session: "randomtoken" };
-                await controllerSpy(req as Request, res as Response, spy);
-                assert(!controllerSpy.threw(), "controller should not throw");
+                await controllerSpy(req as Request, res as Response, next);
+                s_assert.notCalled(next as SinonSpy);
                 s_assert.calledWithExactly(res.clearCookie as SinonSpy, "visitor_session");
                 s_assert.calledWithExactly(res.send as SinonSpy);
             });
         });
 
         describe("[GET] /:visitor_id", () => {
-            it("should return a visitor from the request context", async () => {
+            it("should return a visitor", async () => {
                 const controllerSpy = spy(VisitorController.getVisitorID);
                 req.ctxVisitor = dbData.visitors[1] as Visitor;
-                await controllerSpy(req as Request, res as Response, spy);
-                assert(!controllerSpy.threw(), "controller should not throw");
+                await controllerSpy(req as Request, res as Response, next);
+                s_assert.notCalled(next as SinonSpy);
                 s_assert.calledWithExactly(res.json as SinonSpy, req.ctxVisitor);
             });
         });
 
         describe("[POST] /", () => {
-            let controllerSpy: SinonSpy;
-
-            before(async () => {
-                controllerSpy = spy(VisitorController.postVisitor);
+            it("should return a visitor and a node", async () => {
+                const controllerSpy = spy(VisitorController.postVisitor);
+                const visitor = { name: "test", email: "test@gmail.com", password: "test" };
+                const partialNode = { name: visitor.name };
                 req.body = { name: "test", email: "test@gmail.com", password: "test" };
-                await controllerSpy(req as Request, res as Response, spy);
+                await controllerSpy(req as Request, res as Response, next);
+                s_assert.notCalled(next as SinonSpy);
+                s_assert.calledWithMatch(
+                    res.json as SinonSpy,
+                    { visitor: { name: "test", email: "test@gmail.com" }, node: partialNode },
+                );
+            });
+        });
+
+        describe("[POST] /login", () => {
+            it("should return a visitor", async () => {
+                // pass
             });
         });
     });
