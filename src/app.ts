@@ -1,12 +1,12 @@
-import * as morgan from "morgan";
 import * as bodyparser from "body-parser";
 import * as cookieparser from "cookie-parser";
-import * as helmet from "helmet";
-
-import * as express from "express";
 import * as cors from "cors";
+import * as express from "express";
+import * as helmet from "helmet";
+import * as morgan from "morgan";
 
 import { router as api_routes } from "./controllers";
+import { logger } from "./utils/log.utils";
 
 const app = express();
 
@@ -22,9 +22,22 @@ app.use(bodyparser.json());
 app.use(api_routes);
 
 // Error-handling middleware
-app.use((err: { status: number, message: string }, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log(err);
-    res.status(err.status || 500).json({ errors: { message: err.message, status: err.status || 500 }});
+app.use((
+    err: {
+        status: number,
+        message: string,
+    },
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+) => {
+    logger.warn(err.message);
+    res.status(err.status || 500).json({
+        errors: {
+            message: err.message,
+            status: err.status || 500,
+        },
+    });
 });
 
 export { app };

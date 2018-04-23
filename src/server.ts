@@ -1,5 +1,7 @@
 import * as util from "util";
 
+import { logger } from "./utils/log.utils";
+
 const promiseTimeout = util.promisify(setTimeout);
 
 import { createConnection, getConnection } from "typeorm";
@@ -14,18 +16,18 @@ export const blockingConnectionWait = async () => {
         try {
             await createConnection();
             return;
-        } catch(e) {
-            console.log("Failed to connect to database. Retrying...");
+        } catch (e) {
+            logger.warn("Failed to connect to database. Retrying...");
             await promiseTimeout(3000, async () => await blockingConnectionWait);
         }
     }
 }
 
 (async () => {
-    console.log("Connecting to database...");
+    logger.info("Connecting to database...");
     await blockingConnectionWait();
-    console.log("Database connection OK");
+    logger.info("Database connection OK");
     app.listen(PORT as number, HOST, () => {
-        console.log(`Nodeworld API is now listening on ${HOST}:${PORT}...`);
+        logger.info(`Nodeworld API is now listening on ${HOST}:${PORT}...`);
     });
 })();
