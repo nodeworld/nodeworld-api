@@ -32,10 +32,12 @@ export class Visitor {
     public email: string | null;
 
     @Column("text", { select: false })
-    public passwordHash: string;
+    // tslint:disable-next-line:variable-name
+    public password_hash: string;
 
     @Column("text", { select: false })
-    public passwordSalt: string;
+    // tslint:disable-next-line:variable-name
+    public password_salt: string;
 
     constructor(config: VisitorConfig) {
         if (config) {
@@ -51,18 +53,18 @@ export class Visitor {
 
     public async setPassword(password: string) {
         if (!password.trim()) throw new Error("Password required.");
-        this.passwordSalt = await genSalt(10);
-        this.passwordHash = await genHash(password, this.passwordSalt);
+        this.password_salt = await genSalt(10);
+        this.password_hash = await genHash(password, this.password_salt);
     }
 
     public async authenticate(password: string) {
-        return await compare(password, this.passwordHash);
+        return await compare(password, this.password_hash);
     }
 
     @BeforeInsert()
     @BeforeUpdate()
     private async validate() {
-        if (!this.passwordSalt || !this.passwordHash) throw new Error("Password required.");
+        if (!this.password_salt || !this.password_hash) throw new Error("Password required.");
         const errors = await validate(this, { validationError: { target: false } });
         if (errors.length) throw errors;
     }

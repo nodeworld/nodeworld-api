@@ -1,18 +1,16 @@
+import { createConnection, getConnection } from "typeorm";
 import * as util from "util";
 
+import { app } from "./app";
 import { logger } from "./utils/log.utils";
 
 const promiseTimeout = util.promisify(setTimeout);
-
-import { createConnection, getConnection } from "typeorm";
-
-import { app } from "./app";
 
 const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 2000;
 
 export const blockingConnectionWait = async () => {
-    while(true) {
+    while (true) {
         try {
             await createConnection();
             return;
@@ -21,7 +19,7 @@ export const blockingConnectionWait = async () => {
             await promiseTimeout(3000, async () => await blockingConnectionWait);
         }
     }
-}
+};
 
 (async () => {
     logger.info("Connecting to database...");

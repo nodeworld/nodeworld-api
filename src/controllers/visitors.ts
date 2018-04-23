@@ -80,7 +80,7 @@ export const postLogin: express.RequestHandler = async (req, res, next) => {
         if (req.visitor) throw { message: "Already logged in.", status: 403 };
         const db = getRepository(Visitor);
         const visitor = await db.findOne({
-            select: ["id", "name", "email", "passwordSalt", "passwordHash"],
+            select: ["id", "name", "email", "password_salt", "password_hash"],
             where: { name: req.body.name },
         });
         if (!visitor) throw { message: "Not found.", status: 404 };
@@ -104,7 +104,7 @@ export const patchMe: express.RequestHandler = async (req, res, next) => {
         if (req.body.visitor_id) throw { message: "Cannot change visitor ID", status: 403 };
         const db = getRepository(Visitor);
         const visitor = await db.findOneById(req.visitor.id, {
-            select: ["id", "name", "email", "passwordSalt", "passwordHash"],
+            select: ["id", "name", "email", "password_salt", "password_hash"],
         });
         if (!visitor) throw { message: "Not found.", status: 404 };
         db.merge(visitor, req.body);
