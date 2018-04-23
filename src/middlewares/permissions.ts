@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 
 export const isNodeOwner = (req: Request, res: Response, next: NextFunction) => {
-    if(req.visitor.id === req.ctx_node!.owner_id)
+    if (req.visitor.id === req.ctx_node!.owner_id) {
         next();
-    else
+    } else {
         next({ message: "Insufficient permissions.", status: 401 });
-}
+    }
+};
