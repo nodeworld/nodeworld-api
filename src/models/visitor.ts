@@ -1,60 +1,58 @@
-import { Entity, Column, PrimaryColumn, BeforeUpdate, BeforeInsert, OneToMany } from "typeorm";
-import { genSalt, hash as genHash, compare, compareSync } from "bcrypt";
-import { validate, IsAlphanumeric, IsNotEmpty, IsOptional, IsEmail } from "class-validator";
+import { compare, compareSync, genSalt, hash as genHash } from "bcrypt";
+import { IsAlphanumeric, IsEmail, IsNotEmpty, IsOptional, validate } from "class-validator";
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { v1 as uuidv1 } from "uuid";
 
+import { Message } from "./message";
 import { Node } from "./node";
 import { Script } from "./script";
-import { Message } from "./message";
 
 @Entity()
 export class Visitor {
     @PrimaryColumn("uuid")
-    id: string;
+    public id: string;
 
     @OneToMany(type => Node, node => node.owner)
-    nodes: Node[];
+    public nodes: Node[];
 
     @OneToMany(type => Script, script => script.owner)
-    scripts: Script[];
+    public scripts: Script[];
 
     @OneToMany(type => Message, message => message.author)
-    messages: Message[];
-    
+    public messages: Message[];
+
     @IsAlphanumeric()
     @IsNotEmpty()
     @Column("text", { unique: true })
-    name: string;
+    public name: string;
 
     @IsOptional()
     @IsEmail()
     @Column("text", { nullable: true, unique: true })
-    email: string | null;
+    public email: string | null;
 
     @Column("text", { select: false })
-    password_hash: string;
+    // tslint:disable-next-line:variable-name
+    public password_hash: string;
 
     @Column("text", { select: false })
-    password_salt: string;
+    // tslint:disable-next-line:variable-name
+    public password_salt: string;
 
     constructor(config: VisitorConfig) {
-        if(config) {
+        if (config) {
             this.id = uuidv1();
             this.name = config.name;
             this.email = config.email || null;
         }
     }
 
-    @BeforeInsert()
-    @BeforeUpdate()
-    private async validate() {
-        if(!this.password_salt || !this.password_hash) throw new Error("Password required.");
-        const errors = await validate(this, { validationError: { target: false } });
-        if(errors.length) throw errors;
+    public safe() {
+        return { id: this.id, name: this.name, email: this.email };
     }
 
     public async setPassword(password: string) {
-        if(!password.trim()) throw new Error("Password required.");
+        if (!password.trim()) throw new Error("Password required.");
         this.password_salt = await genSalt(10);
         this.password_hash = await genHash(password, this.password_salt);
     }
@@ -63,8 +61,12 @@ export class Visitor {
         return await compare(password, this.password_hash);
     }
 
-    public safe() {
-        return { id: this.id, name: this.name, email: this.email };
+    @BeforeInsert()
+    @BeforeUpdate()
+    private async validate() {
+        if (!this.password_salt || !this.password_hash) throw new Error("Password required.");
+        const errors = await validate(this, { validationError: { target: false } });
+        if (errors.length) throw errors;
     }
 }
 

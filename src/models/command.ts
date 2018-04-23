@@ -1,5 +1,14 @@
-import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, OneToOne, BeforeInsert, BeforeUpdate } from "typeorm";
-import { validate, IsNotEmpty } from "class-validator";
+import { IsNotEmpty, validate } from "class-validator";
+import {
+    BeforeInsert,
+    BeforeUpdate,
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToOne,
+    PrimaryColumn,
+} from "typeorm";
 import { v1 as uuidv1 } from "uuid";
 
 import { Node } from "./node";
@@ -8,28 +17,30 @@ import { Script } from "./script";
 @Entity()
 export class Command {
     @PrimaryColumn("uuid")
-    id: string;
+    public id: string;
 
     @Column({ nullable: false })
-    node_id: string;
+    // tslint:disable-next-line:variable-name
+    public node_id: string;
 
     @Column({ nullable: false })
-    script_id: string | null;
+    // tslint:disable-next-line:variable-name
+    public script_id: string | null;
 
     @ManyToOne(type => Node, node => node.commands, { onDelete: "CASCADE" })
     @JoinColumn({ name: "node_id" })
-    node: Node;
+    public node: Node;
 
     @OneToOne(type => Script)
     @JoinColumn({ name: "script_id" })
-    script: Script | null;
+    public script: Script | null;
 
     @IsNotEmpty()
     @Column("text")
-    name: string;
+    public name: string;
 
     constructor(config: CommandConfig) {
-        if(config) {
+        if (config) {
             this.id = uuidv1();
             this.node = config.node;
             this.script = config.script || null;
@@ -41,7 +52,7 @@ export class Command {
     @BeforeUpdate()
     private async validate() {
         const errors = await validate(this, { validationError: { target: false } });
-        if(errors.length) throw errors[0];
+        if (errors.length) throw errors[0];
     }
 }
 

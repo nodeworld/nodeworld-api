@@ -46,7 +46,8 @@
     "ts-node": "^5.0.1",
     "typeorm": "^0.1.16",
     "typescript": "^2.8.1",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "winston": "^2.4.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^1.0.0",
@@ -70,7 +71,10 @@
     "@types/node": "^9.4.7",
     "@types/sinon": "^4.3.1",
     "@types/uuid": "^3.4.3",
+    "@types/winston": "^2.3.9",
     "keypair": "^1.0.1",
-    "nyc": "^11.6.0"
+    "nyc": "^11.6.0",
+    "tslint": "^5.9.1",
+    "tslint-config-airbnb": "^5.8.0"
   }
 }

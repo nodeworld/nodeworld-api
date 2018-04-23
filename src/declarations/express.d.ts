@@ -5,9 +5,8 @@ declare global {
     namespace Express {
         interface Request {
             visitor: PublicVisitor;
-            ctx_visitor?: Visitor;
-            ctx_node?: Node;
-            //session?: Session;
+            ctxVisitor?: Visitor;
+            ctxNode?: Node;
         }
     }
 }
