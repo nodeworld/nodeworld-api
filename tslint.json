@@ -12,7 +12,8 @@
         "ordered-imports": [true, {
             "grouped-imports": true
         }],
-        "interface-name" : [true, "never-prefix"]
+        "interface-name": [true, "never-prefix"],
+        "no-unused-variable": true
     },
     "rulesDirectory": []
 }
