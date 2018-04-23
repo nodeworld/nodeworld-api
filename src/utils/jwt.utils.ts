@@ -24,9 +24,7 @@ export const signToken = async (payload: any): Promise<any> => {
             key: PRIVATE_KEY.toString(),
             passphrase: PRIVATE_KEY_PASSPHRASE,
         },
-        {
-            algorithm: "RS256",
-        },
+        { algorithm: "RS256" },
     );
 };
 

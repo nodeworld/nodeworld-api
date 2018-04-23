@@ -1,53 +1,53 @@
-import { v1 as uuidv1 } from "uuid";
 import { stub } from "sinon";
+import { v1 as uuidv1 } from "uuid";
 
 export interface FindOptions {
     skip: number;
     take: number;
 }
 
-export const db_data = {
+export const dbData = {
     visitors: [
         { id: uuidv1(), name: "mike", email: "mike@gmail.com" },
         { id: uuidv1(), name: "josh", email: "josh@gmail.com" },
-        { id: uuidv1(), name: "tom", email: "tom@gmail.com" }
+        { id: uuidv1(), name: "tom", email: "tom@gmail.com" },
     ],
     nodes: [
-        { id: uuidv1(), name: "main", greeting: "Welcome to Nodeworld!" }
-    ]
-}
+        { id: uuidv1(), name: "main", greeting: "Welcome to Nodeworld!" },
+    ],
+};
 
-const save_data = (e: any) => {
-    switch(e.constructor.name) {
+const saveData = (e: any) => {
+    switch (e.constructor.name) {
         case "Visitor":
-            db_data.visitors.push(e.safe());
+            dbData.visitors.push(e.safe());
             break;
         case "Node":
-            db_data.nodes.push(e.safe());
+            dbData.nodes.push(e.safe());
             break;
     }
-}
+};
 
-export const repo_stub = {
+export const repoStub = {
     find: async (opts: FindOptions) => {
-        if(opts.skip && !opts.take)
-            return db_data.visitors.slice(opts.skip);
-        else if(!opts.skip && opts.take)
-            return db_data.visitors.slice(0, opts.take);
-        else if(opts.skip && opts.take)
-            return db_data.visitors.slice(opts.skip, opts.skip + opts.take);
-        else
-            return db_data.visitors;
-    }
-}
+        if (opts.skip && !opts.take) {
+            return dbData.visitors.slice(opts.skip);
+        } else if (!opts.skip && opts.take) {
+            return dbData.visitors.slice(0, opts.take);
+        } else if (opts.skip && opts.take) {
+            return dbData.visitors.slice(opts.skip, opts.skip + opts.take);
+        }
+        return dbData.visitors;
+    },
+};
 
-export const man_stub = {
+export const manStub = {
     save: async (data: any | any[]) => {
-        if(Array.isArray(data)) {
-            data.forEach(save_data);
+        if (Array.isArray(data)) {
+            data.forEach(saveData);
         } else {
-            save_data(data);
+            saveData(data);
             return data;
         }
-    }
-}
+    },
+};
