@@ -1,3 +1,0 @@
-interface Error {
-    status: number
-}
