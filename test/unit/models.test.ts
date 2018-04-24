@@ -1,52 +1,46 @@
-import { assert } from "chai";
-import { assert as s_assert, spy } from "sinon";
+import { expect } from "chai";
+import chai = require("chai");
+import chaiAsPromised = require("chai-as-promised");
+import sinonChai = require("sinon-chai");
 
 import { Message, MessageType } from "../../src/models/message";
 import { Node } from "../../src/models/node";
 import { Visitor } from "../../src/models/visitor";
 
+chai.use(sinonChai);
+chai.use(chaiAsPromised);
+
 describe("Models", () => {
     describe("Visitor", () => {
         it("should create and return a visitor", () => {
             const visitor = new Visitor({ name: "test" });
-            assert.containsAllKeys(
-                visitor,
-                ["id", "name"],
-                "visitor does not contain necessary properties",
-            );
+            expect(visitor).to.have.all.keys(["id", "name", "email"]);
         });
 
         it("should generate an id", () => {
             const visitor = new Visitor({ name: "test" });
-            assert.property(visitor, "id", "visitor does not contain id property");
-            assert.isNotEmpty(visitor.id, "visitor id property is empty");
+            expect(visitor).to.have.property("id").that.is.not.empty;
         });
 
         it("should generate a password", async () => {
             const visitor = new Visitor({ name: "test" });
             await visitor.setPassword("test");
-            assert.isNotEmpty(visitor.passwordHash, "visitor password hash is empty");
-            assert.isNotEmpty(visitor.passwordSalt, "visitor password salt is empty");
+            expect(visitor).to.have.property("password_hash").that.is.not.empty;
+            expect(visitor).to.have.property("password_salt").that.is.not.empty;
         });
 
         it("should successfully authenticate", async () => {
             const visitor = new Visitor({ name: "test" });
-            const authSpy = spy(visitor, "authenticate");
             await visitor.setPassword("test");
             await visitor.authenticate("test");
-            assert(await authSpy.firstCall.returnValue === true, "authentication was rejected");
-            authSpy.restore();
+            expect(visitor.authenticate("test")).to.eventually.be.fulfilled;
         });
 
         it("should return a safe copy", async () => {
             const visitor = new Visitor({ name: "test" });
             await visitor.setPassword("test");
             const safe = visitor.safe();
-            assert.hasAllKeys(
-                safe,
-                ["id", "name", "email"],
-                "safe copy does not have necessary properties",
-            );
+            expect(safe).to.have.all.keys(["id", "name", "email"]);
         });
     });
 
@@ -54,29 +48,20 @@ describe("Models", () => {
         it("should create and return a node", () => {
             const owner = new Visitor({ name: "test" });
             const node = new Node({ owner, name: "testworld" });
-            assert.containsAllKeys(
-                node,
-                ["id", "owner", "name", "greeting"],
-                "node does not contain necessary properties",
-            );
+            expect(node).to.have.all.keys(["id", "owner", "name", "greeting"]);
         });
 
         it("should generate an id", () => {
             const owner = new Visitor({ name: "test" });
             const node = new Node({ owner, name: "testworld" });
-            assert.property(node, "id", "node does not contain id property");
-            assert.isNotEmpty(node.id, "node id is empty");
+            expect(node).to.have.property("id").that.is.not.empty;
         });
 
         it("should return a safe copy", async () => {
             const owner = new Visitor({ name: "test" });
             const node = new Node({ owner, name: "testworld" });
             const safe = node.safe();
-            assert.hasAllKeys(
-                safe,
-                ["id", "name", "greeting", "owner_id"],
-                "safe copy does not have necessary properties",
-            );
+            expect(safe).to.have.all.keys(["id", "owner_id", "name", "greeting"]);
         });
     });
 
@@ -91,11 +76,7 @@ describe("Models", () => {
                 name: author.name,
                 content: "hello world!",
             });
-            assert.containsAllKeys(
-                message,
-                ["id", "author", "node", "type", "name", "content"],
-                "message does not contain necessary properties",
-            );
+            expect(message).to.have.all.keys(["id", "author", "node", "type", "name", "content"]);
         });
 
         it("should generate an id", () => {
@@ -108,8 +89,7 @@ describe("Models", () => {
                 name: author.name,
                 content: "hello world!",
             });
-            assert.property(message, "id", "message does not contain id property");
-            assert.isNotEmpty(message.id, "message id is empty");
+            expect(message).to.have.property("id").that.is.not.empty;
         });
 
         it("should return a safe copy", () => {
@@ -123,11 +103,14 @@ describe("Models", () => {
                 content: "hello world!",
             });
             const safe = message.safe();
-            assert.hasAllKeys(
-                safe,
-                ["id", "author_id", "node_id", "type", "name", "content"],
-                "message does not have necessary properties",
-            );
+            expect(safe).to.have.all.keys([
+                "id",
+                "author_id",
+                "node_id",
+                "type",
+                "name",
+                "content",
+            ]);
         });
     });
 });

@@ -1,7 +1,6 @@
 import { assert, expect } from "chai";
-import { Request, Response } from "express";
-import { NextFunction } from "express-serve-static-core";
-import { assert as s_assert, SinonSpy, SinonStub, spy, stub } from "sinon";
+import { NextFunction, Request, Response } from "express";
+import { SinonSpy, SinonStub, spy, stub } from "sinon";
 import * as typeorm from "typeorm";
 
 import * as VisitorController from "../../src/controllers/visitors";
@@ -18,7 +17,7 @@ describe("Controllers", () => {
     let res: Partial<Response>;
     let next: NextFunction;
 
-    beforeAll(() => {
+    before(() => {
         repositoryStub = stub(typeorm, "getRepository").returns(repoStub);
         managerStub = stub(typeorm, "getManager").returns(manStub);
         readTokenStub = stub(jwt_utils, "readToken").callsFake(readToken);
@@ -30,7 +29,7 @@ describe("Controllers", () => {
         next = spy();
     });
 
-    afterAll(() => {
+    after(() => {
         repositoryStub.restore();
         readTokenStub.restore();
     });
@@ -39,22 +38,19 @@ describe("Controllers", () => {
         describe("[GET] /", () => {
             let controllerSpy: SinonSpy;
 
-            beforeAll(() => {
+            before(() => {
                 controllerSpy = spy(VisitorController.getVisitors);
             });
 
             it("should return an array of visitors", async () => {
                 await controllerSpy(req as Request, res as Response, next);
-                s_assert.notCalled(next as SinonSpy);
-                s_assert.calledWithExactly(res.json as SinonSpy, { visitors: dbData.visitors });
+                expect(res.json).to.have.been.calledWithExactly({ visitors: dbData.visitors });
             });
 
             it("should respect skipping", async () => {
                 req.query = { skip: 1 };
                 await controllerSpy(req as Request, res as Response, next);
-                s_assert.notCalled(next as SinonSpy);
-                s_assert.calledWithExactly(
-                    res.json as SinonSpy,
+                expect(res.json).to.have.been.calledWithExactly(
                     { visitors: dbData.visitors.slice(1) },
                 );
             });
@@ -62,9 +58,7 @@ describe("Controllers", () => {
             it("should respect limiting", async () => {
                 req.query = { limit: 1 };
                 await controllerSpy(req as Request, res as Response, next);
-                s_assert.notCalled(next as SinonSpy);
-                s_assert.calledWithExactly(
-                    res.json as SinonSpy,
+                expect(res.json).to.have.been.calledWithExactly(
                     { visitors: dbData.visitors.slice(0, 1) },
                 );
             });
@@ -72,9 +66,7 @@ describe("Controllers", () => {
             it("should respect skipping and limiting", async () => {
                 req.query = { skip: 1, limit: 1 };
                 await controllerSpy(req as Request, res as Response, next);
-                s_assert.notCalled(next as SinonSpy);
-                s_assert.calledWithExactly(
-                    res.json as SinonSpy,
+                expect(res.json).to.have.been.calledWithExactly(
                     { visitors: dbData.visitors.slice(1, 2) },
                 );
             });
@@ -85,8 +77,7 @@ describe("Controllers", () => {
                 const controllerSpy = spy(VisitorController.getMe);
                 req.visitor = dbData.visitors[0];
                 await controllerSpy(req as Request, res as Response, next);
-                s_assert.notCalled(next as SinonSpy);
-                s_assert.calledWithExactly(res.json as SinonSpy, req.visitor);
+                expect(res.json).to.have.been.calledWithExactly(req.visitor);
             });
         });
 
@@ -95,9 +86,8 @@ describe("Controllers", () => {
                 const controllerSpy = spy(VisitorController.getLogout);
                 req.cookies = { visitor_session: "randomtoken" };
                 await controllerSpy(req as Request, res as Response, next);
-                s_assert.notCalled(next as SinonSpy);
-                s_assert.calledWithExactly(res.clearCookie as SinonSpy, "visitor_session");
-                s_assert.calledWithExactly(res.send as SinonSpy);
+                expect(res.clearCookie).to.have.been.calledWithExactly("visitor_session");
+                expect(res.send).to.have.been.called;
             });
         });
 
@@ -106,8 +96,7 @@ describe("Controllers", () => {
                 const controllerSpy = spy(VisitorController.getVisitorID);
                 req.ctxVisitor = dbData.visitors[1] as Visitor;
                 await controllerSpy(req as Request, res as Response, next);
-                s_assert.notCalled(next as SinonSpy);
-                s_assert.calledWithExactly(res.json as SinonSpy, req.ctxVisitor);
+                expect(res.json).to.have.been.calledWithExactly(req.ctxVisitor);
             });
         });
 
@@ -118,9 +107,7 @@ describe("Controllers", () => {
                 const partialNode = { name: visitor.name };
                 req.body = { name: "test", email: "test@gmail.com", password: "test" };
                 await controllerSpy(req as Request, res as Response, next);
-                s_assert.notCalled(next as SinonSpy);
-                s_assert.calledWithMatch(
-                    res.json as SinonSpy,
+                expect(res.json).to.have.been.calledWithMatch(
                     { visitor: { name: "test", email: "test@gmail.com" }, node: partialNode },
                 );
             });

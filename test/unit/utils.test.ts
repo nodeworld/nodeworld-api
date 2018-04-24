@@ -1,10 +1,10 @@
-import { assert } from "chai";
+import { expect } from "chai";
 import { SinonStub, stub } from "sinon";
 
 import * as jwt_utils from "../../src/utils/jwt.utils";
 
 import { parseCommand } from "../../src/utils/command.utils";
-import { keys } from "../helpers/jwt";
+import { keys, readToken, signToken } from "../helpers/jwt";
 
 describe("Utils", () => {
     describe("JWT", () => {
@@ -13,9 +13,8 @@ describe("Utils", () => {
                 const readStub = stub(jwt_utils, "read").resolves(keys.private);
                 const data = "secret data";
                 const token = await jwt_utils.signToken(data);
-                assert(token !== undefined, "token is undefined");
-                assert(typeof token === "string", "signed token is not a string");
-                assert(token !== data, "signed token is equal to unsigned data");
+                expect(token).to.be.a("string");
+                expect(token).to.not.equal(data);
                 readStub.restore();
             });
         });
@@ -26,8 +25,7 @@ describe("Utils", () => {
                 const rawData = "secret data";
                 const token = await jwt_utils.signToken(rawData);
                 const readData = await jwt_utils.readToken(token);
-                assert(readData !== undefined, "read data is undefined");
-                assert(readData === rawData, "read data is not equal to raw data");
+                expect(readData).to.equal(rawData);
                 readStub.restore();
             });
         });
@@ -38,10 +36,10 @@ describe("Utils", () => {
             it("should parse a command correctly", () => {
                 const raw = "/announce hello";
                 const command = parseCommand(raw);
-                assert(command.name === "announce", "command name is not announce");
-                assert(Array.isArray(command.args), "command args are not an array");
-                assert(command.args[0] === "hello", "first command arg is not hello");
-                assert(command.raw === raw, "raw command is not /announce hello");
+                expect(command.name).to.equal("announce");
+                expect(command.args).to.be.an("array").that.is.not.empty;
+                expect(command.args[0]).to.equal("hello");
+                expect(command.raw).to.equal(raw);
             });
         });
     });
