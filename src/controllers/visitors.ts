@@ -91,7 +91,7 @@ export const postLogin: express.RequestHandler = async (req, res, next) => {
         res.cookie("visitor_session", token, {
             httpOnly: true,
             signed: true,
-            domain: "nodeworld.io",
+            domain: process.env.TOKEN_DOMAIN,
         });
         res.json(visitor.safe());
     } catch (e) { next(e); }
