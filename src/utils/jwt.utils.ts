@@ -3,15 +3,11 @@ import * as jwt from "jsonwebtoken";
 
 import { promisify } from "util";
 
-const PRIVATE_KEY_PATH = process.env.JWT_PRIVATE_KEY_PATH;
-const PRIVATE_KEY_PASSPHRASE = process.env.JWT_PRIVATE_KEY_PASSPHRASE;
-const PUBLIC_KEY_PATH = process.env.JWT_PUBLIC_KEY_PATH;
+const PRIVATE_KEY_PATH = process.env.JWT_PRIVATE_KEY_PATH!;
+const PRIVATE_KEY_PASSPHRASE = process.env.JWT_PRIVATE_KEY_PASSPHRASE!;
+const PUBLIC_KEY_PATH = process.env.JWT_PUBLIC_KEY_PATH!;
 
 export const read = promisify(fs.readFile);
-
-if (!PRIVATE_KEY_PATH) throw new Error("JWT private key path is undefined.");
-if (!PRIVATE_KEY_PASSPHRASE) throw new Error("JWT private key passphrase is undefined.");
-if (!PUBLIC_KEY_PATH) throw new Error("JWT public key passphrase is undefined.");
 
 let PRIVATE_KEY: Buffer;
 let PUBLIC_KEY: Buffer;

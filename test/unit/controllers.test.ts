@@ -18,7 +18,7 @@ describe("Controllers", () => {
     let res: Partial<Response>;
     let next: NextFunction;
 
-    before(() => {
+    beforeAll(() => {
         repositoryStub = stub(typeorm, "getRepository").returns(repoStub);
         managerStub = stub(typeorm, "getManager").returns(manStub);
         readTokenStub = stub(jwt_utils, "readToken").callsFake(readToken);
@@ -30,7 +30,7 @@ describe("Controllers", () => {
         next = spy();
     });
 
-    after(() => {
+    afterAll(() => {
         repositoryStub.restore();
         readTokenStub.restore();
     });
@@ -39,7 +39,7 @@ describe("Controllers", () => {
         describe("[GET] /", () => {
             let controllerSpy: SinonSpy;
 
-            before(() => {
+            beforeAll(() => {
                 controllerSpy = spy(VisitorController.getVisitors);
             });
 

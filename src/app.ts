@@ -1,3 +1,4 @@
+import * as assert from "assert";
 import * as bodyparser from "body-parser";
 import * as cookieparser from "cookie-parser";
 import * as cors from "cors";
@@ -11,6 +12,11 @@ import { logger } from "./utils/log.utils";
 const PRODUCTION = true;
 
 const app = express();
+
+// Environment variable assertions
+assert(process.env.PRIVATE_KEY_PATH);
+assert(process.env.PRIVATE_KEY_PASSPHRASE);
+assert(process.env.PUBLIC_KEY_PATH);
 
 // Third-party middleware
 app.use(helmet());
